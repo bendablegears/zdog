@@ -58,6 +58,26 @@ Ellipse.prototype.setPath = function() {
   }
 };
 
+var animateableProperties = [ 'diameter', ];
+animateableProperties.forEach( function( property ) {
+  // use proxy property for custom getter & setter
+  var _prop = '_' + property;
+  Object.defineProperty( Ellipse.prototype, property, {
+    get: function() {
+      return this[ _prop ];
+    },
+    set: function( value ) {
+      this[ _prop ] = value;
+      // set property on children
+	  if (property === 'diameter') {
+		this.setPath();
+		this.updatePathCommands();
+	    return;
+	  }
+    },
+  });
+});
+
 return Ellipse;
 
 }));

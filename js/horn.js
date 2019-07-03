@@ -7,15 +7,15 @@
   if ( typeof module == 'object' && module.exports ) {
     // CommonJS
     module.exports = factory( require('./boilerplate'),
-        require('./path-command'), require('./shape'), require('./group'),
-        require('./vector') );
+        require('./path-command'), require('./shape'), require('./ellipse'),
+        require('./group'), require('./vector') );
   } else {
     // browser global
     var Zdog = root.Zdog;
-    Zdog.Horn = factory( Zdog, Zdog.PathCommand, Zdog.Shape,
+    Zdog.Horn = factory( Zdog, Zdog.PathCommand, Zdog.Shape, Zdog.Ellipse,
         Zdog.Group, Zdog.Vector );
   }
-}( this, function factory( utils, PathCommand, Shape, Group, Vector ) {
+}( this, function factory( utils, PathCommand, Shape, Ellipse, Group, Vector ) {
 
 function noop() {}
 
@@ -56,9 +56,11 @@ HornGroup.prototype.renderHornSurface = function( ctx, renderer ) {
   // render horn surface
   var elem = this.getRenderElement( ctx, renderer );
   var frontBase = this.frontBase;
-  var frontDiameter = frontBase.stroke;
+  var frontDiameter = (frontBase.diameter !== undefined) ?
+                       frontBase.diameter : frontBase.stroke;
   var rearBase = this.rearBase;
-  var rearDiameter = rearBase.stroke;
+  var rearDiameter = (rearBase.diameter !== undefined) ?
+                       rearBase.diameter : rearBase.stroke;
   var scale = frontBase.renderNormal.magnitude();
   
   this.renderApex.set( rearBase.renderOrigin )
@@ -156,6 +158,12 @@ var HornCap = Shape.subclass();
 
 HornCap.prototype.copyGraph = noop;
 
+// ----- HornEllipse ----- //
+
+var HornEllipse = Ellipse.subclass();
+
+HornEllipse.prototype.copyGraph = noop;
+
 // ----- Horn ----- //
 
 var Horn = Shape.subclass({
@@ -164,6 +172,8 @@ var Horn = Shape.subclass({
   length: 1,
   frontFace: undefined,
   fill: true,
+  frontCap: true,
+  rearCap: true,
 });
 
 var TAU = utils.TAU;
@@ -181,40 +191,76 @@ Horn.prototype.create = function(/* options */) {
   var baseZ = this.length/2;
   var baseColor = this.backface || true;
   // front outside base
-  this.frontBase = this.group.frontBase = new HornCap({
-    addTo: this.group,
-    translate: { z: (baseZ - this.frontDiameter/2) },
-    rotate: { y: TAU/2 },
-    color: this.color,
-    stroke: this.frontDiameter,
-    fill: this.fill,
-    backface: this.frontFace || baseColor,
-    visible: this.visible,
-  });
+  if (this.frontCap) {
+      this.frontBase = this.group.frontBase = new HornCap({
+        addTo: this.group,
+        translate: { z: (baseZ - this.frontDiameter/2) },
+        rotate: { y: TAU/2 },
+        color: this.color,
+        stroke: this.frontDiameter,
+        fill: this.fill,
+        backface: this.frontFace || baseColor,
+        visible: this.visible,
+      });
+  } else {
+	  this.frontBase = this.group.frontBase = new HornEllipse({
+        addTo: this.group,
+        diameter: this.frontDiameter,
+        translate: { z: (baseZ - this.frontDiameter/2) },
+        rotate: { y: TAU/2 },
+        color: this.color,
+        stroke: this.stroke,
+        fill: this.fill,
+        backface: this.frontFace || baseColor,
+        visible: this.visible,
+      });
+  }
   // back outside base
-  this.rearBase = this.group.rearBase = new HornCap({
-    addTo: this.group,
-    translate: { z: (-baseZ + this.rearDiameter/2) },
-    rotate: { y: 0 },
-    color: this.color,
-    stroke: this.rearDiameter,
-    fill: this.fill,
-    backface: baseColor,
-    visible: this.visible,
-  });
+  if (this.rearCap) {
+    this.rearBase = this.group.rearBase = new HornCap({
+      addTo: this.group,
+      translate: { z: (-baseZ + this.rearDiameter/2) },
+      rotate: { y: 0 },
+      color: this.color,
+      stroke: this.rearDiameter,
+      fill: this.fill,
+      backface: baseColor,
+      visible: this.visible,
+    });
+  } else {
+	  this.rearBase = this.group.rearBase = new HornEllipse({
+        addTo: this.group,
+        diameter: this.rearDiameter,
+        translate: { z: (-baseZ + this.rearDiameter/2) },
+        rotate: { y: 0 },
+        color: this.color,
+        stroke: this.stroke,
+        fill: this.fill,
+        backface: baseColor,
+        visible: this.visible,
+      });
+  }
   
 };
 
 Horn.prototype.updateFrontCapDiameter = function(size) {
-	this.frontBase.stroke = size;
 	var baseZ = this.length/2;
-	this.frontBase.translate.z = (baseZ - size/2);
+	if (this.frontCap) {
+	  this.frontBase.stroke = size;
+	  this.frontBase.translate.z = (baseZ - size/2);
+	} else {
+	  this.frontBase.diameter = size;
+	}
 }
 
 Horn.prototype.updateRearCapDiameter = function(size) {
-	this.rearBase.stroke = size;
 	var baseZ = this.length/2;
-	this.rearBase.translate.z = (-baseZ + size/2);
+	if (this.rearCap) {
+	  this.rearBase.stroke = size;
+	  this.rearBase.translate.z = (-baseZ + size/2);
+	} else {
+	  this.rearBase.diameter = size;
+	}
 }
 
 // Horn shape does not render anything
