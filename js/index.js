@@ -16,6 +16,7 @@
         require('./illustration'),
         require('./path-command'),
         require('./shape'),
+		require('./debug-shape'),
         require('./group'),
         require('./rect'),
         require('./rounded-rect'),
@@ -32,7 +33,7 @@
     define( 'zdog', [], root.Zdog );
   }
 })( this, function factory( Zdog, CanvasRenderer, SvgRenderer, Vector, Anchor,
-    Dragger, Illustration, PathCommand, Shape, Group, Rect, RoundedRect,
+    Dragger, Illustration, PathCommand, Shape, DebugShape, Group, Rect, RoundedRect,
     Ellipse, Polygon, Hemisphere, Cylinder, Cone, Horn, Box ) {
 
       Zdog.CanvasRenderer = CanvasRenderer;
@@ -43,6 +44,7 @@
       Zdog.Illustration = Illustration;
       Zdog.PathCommand = PathCommand;
       Zdog.Shape = Shape;
+	  Zdog.DebugShape = DebugShape;
       Zdog.Group = Group;
       Zdog.Rect = Rect;
       Zdog.RoundedRect = RoundedRect;
