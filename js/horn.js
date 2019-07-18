@@ -201,7 +201,7 @@ Horn.prototype.create = function(/* options */) {
   if (this.frontCap) {
       this.frontBase = this.group.frontBase = new HornCap({
         addTo: this.group,
-        translate: { z: (baseZ - this.frontDiameter/2) },
+        translate: { z: (baseZ) },
         rotate: { y: TAU/2 },
         color: this.color,
         stroke: this.frontDiameter,
@@ -213,7 +213,7 @@ Horn.prototype.create = function(/* options */) {
 	  this.frontBase = this.group.frontBase = new HornEllipse({
         addTo: this.group,
         diameter: this.frontDiameter,
-        translate: { z: (baseZ - this.frontDiameter/2) },
+        translate: { z: (baseZ) },
         rotate: { y: TAU/2 },
         color: this.color,
         stroke: this.stroke,
@@ -226,7 +226,7 @@ Horn.prototype.create = function(/* options */) {
   if (this.rearCap) {
     this.rearBase = this.group.rearBase = new HornCap({
       addTo: this.group,
-      translate: { z: (-baseZ + this.rearDiameter/2) },
+      translate: { z: (-baseZ) },
       rotate: { y: 0 },
       color: this.color,
       stroke: this.rearDiameter,
@@ -238,7 +238,7 @@ Horn.prototype.create = function(/* options */) {
 	  this.rearBase = this.group.rearBase = new HornEllipse({
         addTo: this.group,
         diameter: this.rearDiameter,
-        translate: { z: (-baseZ + this.rearDiameter/2) },
+        translate: { z: (-baseZ) },
         rotate: { y: 0 },
         color: this.color,
         stroke: this.stroke,
@@ -254,7 +254,7 @@ Horn.prototype.updateFrontCapDiameter = function(size) {
 	var baseZ = this.length/2;
 	if (this.frontCap) {
 	  this.frontBase.stroke = size;
-	  this.frontBase.translate.z = (baseZ - size/2);
+	  this.frontBase.translate.z = (baseZ);
 	} else {
 	  this.frontBase.diameter = size;
 	}
@@ -264,7 +264,7 @@ Horn.prototype.updateRearCapDiameter = function(size) {
 	var baseZ = this.length/2;
 	if (this.rearCap) {
 	  this.rearBase.stroke = size;
-	  this.rearBase.translate.z = (-baseZ + size/2);
+	  this.rearBase.translate.z = (-baseZ);
 	} else {
 	  this.rearBase.diameter = size;
 	}
